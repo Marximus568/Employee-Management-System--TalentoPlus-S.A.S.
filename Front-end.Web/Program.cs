@@ -1,8 +1,8 @@
 using Application;
 using Infrastructure;
 
-// Load environment variables from .env-example file
-DotNetEnv.Env.Load(".env-example");
+// Load environment variables from .env file
+DotNetEnv.Env.Load("../.env");
 
 var builder = WebApplication.CreateBuilder(args);
 

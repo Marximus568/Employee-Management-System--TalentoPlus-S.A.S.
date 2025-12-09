@@ -1,0 +1,128 @@
+﻿services:
+  # DATABASE
+  postgres:
+    image: postgres:17
+    restart: always
+    env_file:
+      - .env
+    container_name: Employee-Management-System--TalentoPlus-S.A.S-Postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - Employee-Management-System--TalentoPlus-S.A.S-network
+  
+  # DB MIGRATOR (Runs migrations and exits)
+  db-migrator:
+    build:
+      context: .
+      dockerfile: Firmeza.WebApi/Dockerfile
+    env_file:
+      - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RUN_MIGRATIONS=true
+      - ONLY_MIGRATE=true
+      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASS};
+      - DB_CONNECTION=Server=postgres;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASS};
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - Employee-Management-System--TalentoPlus-S.A.S-network
+  
+  # TEST
+  tests:
+    build:
+      context: .
+      dockerfile: Firmeza.Test/Dockerfile
+    env_file:
+      - .env
+    environment:
+      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASS};
+    depends_on:
+      db-migrator:
+        condition: service_completed_successfully
+    command: [ "dotnet", "test", "--logger:trx" ]
+    networks:
+      - Employee-Management-System--TalentoPlus-S.A.S-network
+  
+  # API
+  api:
+    build:
+      context: .
+      dockerfile: Firmeza.WebApi/Dockerfile
+    env_file:
+      - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RUN_MIGRATIONS=false
+      - RUN_SEEDERS=1
+      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASS};
+      - DB_CONNECTION=Server=postgres;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASS};
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_FROM=${SMTP_FROM}
+      - SMTP_FROM_NAME=${SMTP_FROM_NAME}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_ENABLE_SSL=${SMTP_ENABLE_SSL}
+      - SMTP_USE_STARTTLS=${SMTP_USE_STARTTLS}
+    depends_on:
+      db-migrator:
+        condition: service_completed_successfully
+    ports:
+      - "5000:8080"
+    networks:
+      - Employee-Management-System--TalentoPlus-S.A.S-network
+  
+  #ADMINDASHBOARD
+  admin:
+    build:
+      context: .
+      dockerfile: AdminDashboard.Web/Dockerfile
+    env_file:
+      - .env
+    environment:
+      - Jwt__Key=${Jwt__Key}
+      - Jwt__Issuer=${Jwt__Issuer}
+      - Jwt__Audience=${Jwt__Audience}
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASS};
+      - DB_CONNECTION=Server=postgres;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASS};
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_FROM=${SMTP_FROM}
+      - SMTP_FROM_NAME=${SMTP_FROM_NAME}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_ENABLE_SSL=${SMTP_ENABLE_SSL}
+      - SMTP_USE_STARTTLS=${SMTP_USE_STARTTLS}
+    depends_on:
+      db-migrator:
+        condition: service_completed_successfully
+      api:
+        condition: service_started
+    ports:
+      - "5001:8080"
+    networks:
+      - firmeza-network
+
+volumes:
+  dbdata:
+
+
+networks:
+  Employee-Management-System--TalentoPlus-S.A.S:
+  -network:
+    driver: bridge

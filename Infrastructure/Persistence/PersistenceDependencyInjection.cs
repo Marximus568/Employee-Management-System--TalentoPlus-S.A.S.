@@ -17,11 +17,29 @@ public static class PersistenceDependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // Get connection string from configuration
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException(
-                "Connection string 'DefaultConnection' not found in configuration. " +
-                "Please add it to appsettings.json");
+        // Build connection string from environment variables
+        // First, try to get the full connection string from DB_CONNECTION
+        var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
+        
+        // If DB_CONNECTION is not set, build it from individual variables
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            var dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
+            var dbPort = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
+            var dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? "postgres";
+            var dbUser = Environment.GetEnvironmentVariable("DB_USER") ?? "postgres";
+            var dbPassword = Environment.GetEnvironmentVariable("DB_PASS") ?? "postgres";
+
+            connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
+        }
+
+        // Validate connection string is not empty
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException(
+                "Database connection string could not be built. " +
+                "Please ensure either DB_CONNECTION or individual DB_* variables are set in your .env file.");
+        }
 
         // Register ApplicationDbContext
         services.AddDbContext<ApplicationDbContext>(options =>

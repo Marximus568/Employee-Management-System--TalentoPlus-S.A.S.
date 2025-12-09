@@ -1,7 +1,6 @@
 using Application.Interfaces;
 using Application.Interfaces.AI;
 using Application.Interfaces.Identity;
-using Application.Interfaces.SMTP;
 using Infrastructure.AI;
 using Infrastructure.Models;
 using Infrastructure.Persistence;
@@ -10,11 +9,12 @@ using Infrastructure.Services.EmployeeService;
 using Infrastructure.Services.Identity;
 using Infrastructure.Services.Identity.Interface;
 using Infrastructure.Services.Jwt;
-using Infrastructure.Services.SMTP;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace Infrastructure;
@@ -29,9 +29,70 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         // ========================================
+        // AUTOMAPPER CONFIGURATION
+        // ========================================
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+        // ========================================
         // JWT CONFIGURATION
         // ========================================
-        services.Configure<Domain.Entities.JwtSettings>(configuration.GetSection("JwtSettings"));
+        var jwtSettings = new Domain.Entities.JwtSettings
+        {
+            SecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
+                ?? throw new InvalidOperationException("JWT_SECRET_KEY is required in .env file"),
+            Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") 
+                ?? "YourApp",
+            Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") 
+                ?? "YourAppUsers",
+            ExpiryMinutes = int.TryParse(Environment.GetEnvironmentVariable("JWT_EXPIRY_MINUTES"), out var expiry) 
+                ? expiry 
+                : 15
+        };
+        services.Configure<Domain.Entities.JwtSettings>(options =>
+        {
+            options.SecretKey = jwtSettings.SecretKey;
+            options.Issuer = jwtSettings.Issuer;
+            options.Audience = jwtSettings.Audience;
+            options.ExpiryMinutes = jwtSettings.ExpiryMinutes;
+        });
+
+        // ========================================
+        // JWT BEARER AUTHENTICATION CONFIGURATION
+        // ========================================
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = "Bearer";
+            options.DefaultChallengeScheme = "Bearer";
+        })
+        .AddJwtBearer("Bearer", options =>
+        {
+            var secretKey = jwtSettings.SecretKey;
+            var key = System.Text.Encoding.ASCII.GetBytes(secretKey);
+
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = true,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidateAudience = true,
+                ValidAudience = jwtSettings.Audience,
+                ValidateLifetime = true,
+                ClockSkew = System.TimeSpan.Zero
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                {
+                    if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                    {
+                        context.Response.Headers["Token-Expired"] = "true";
+                    }
+                    return System.Threading.Tasks.Task.CompletedTask;
+                }
+            };
+        });
 
         // ========================================
         // PERSISTENCE CONFIGURATION (Database & Migrations)
@@ -109,15 +170,41 @@ public static class DependencyInjection
         });
 
         // ========================================
-        // OTHER INFRASTRUCTURE SERVICES
+        // SMTP EMAIL CONFIGURATION
         // ========================================
+        services.Configure<Infrastructure.Services.SMTP.SmtpSettings>(options =>
+        {
+            options.Host = Environment.GetEnvironmentVariable("SMTP_HOST") 
+                ?? throw new InvalidOperationException("SMTP_HOST is required in .env file");
+            options.Port = int.TryParse(Environment.GetEnvironmentVariable("SMTP_PORT"), out var port) 
+                ? port 
+                : 587;
+            options.Username = Environment.GetEnvironmentVariable("SMTP_USER") 
+                ?? throw new InvalidOperationException("SMTP_USER is required in .env file");
+            options.Password = Environment.GetEnvironmentVariable("SMTP_PASSWORD") 
+                ?? throw new InvalidOperationException("SMTP_PASSWORD is required in .env file");
+            options.From = Environment.GetEnvironmentVariable("SMTP_FROM") 
+                ?? "noreply@yourapp.com";
+            options.FromName = Environment.GetEnvironmentVariable("SMTP_FROM_NAME") 
+                ?? "Express Firmeza";
+            options.EnableSsl = bool.TryParse(Environment.GetEnvironmentVariable("SMTP_ENABLE_SSL"), out var ssl) 
+                ? ssl 
+                : false;
+            options.UseStartTls = bool.TryParse(Environment.GetEnvironmentVariable("SMTP_USE_STARTTLS"), out var starttls) 
+                ? starttls 
+                : true;
+        });
         
-        // SMTP Email Service
-        services.Configure<Services.SMTP.SmtpSettings>(configuration.GetSection("SmtpSettings"));
-        services.AddScoped<Application.Interfaces.SMTP.IEmailService, Services.SMTP.SmtpEmailService>();
+        services.AddScoped<Application.Interfaces.SMTP.IEmailService, Infrastructure.Services.SMTP.SmtpEmailService>();
 
-        // Domain/Business Services
+        // ========================================
+        // DOMAIN/BUSINESS SERVICES
+        // ========================================        // Domain/Business Services
         services.AddScoped<IEmployeeService, EmployeeService>();
+        services.AddScoped<IDepartmentService, DepartmentService>();
+        
+        // PDF Service
+        services.AddScoped<Application.Interfaces.PDF.IPdfService, Infrastructure.Services.PDF.PdfService>();
 
         return services;
     }
