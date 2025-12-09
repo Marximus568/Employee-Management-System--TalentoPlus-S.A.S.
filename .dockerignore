@@ -1,0 +1,111 @@
+###############################################
+#       BUILD OUTPUT / BINARIES
+###############################################
+bin/
+obj/
+[Oo]bj/
+[Bb]in/
+**/bin/
+**/obj/
+
+# NuGet global packages (if referenced locally)
+.nuget/
+
+###############################################
+#       .NET + VISUAL STUDIO / RIDER
+###############################################
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+.vs/
+.idea/
+.vscode/
+
+# Rider cache
+**/.idea/
+**/.idea/*
+
+# Temporary files
+*_i.c
+*_p.c
+*_h.h
+
+###############################################
+#       OS / SYSTEM FILES
+###############################################
+.DS_Store
+Thumbs.db
+
+###############################################
+#       LOGS / TEMPORAL
+###############################################
+*.log
+logs/
+**/logs/
+.temp/
+tmp/
+
+###############################################
+#       ENVIRONMENT / SECRETS
+###############################################
+.env
+*.env
+.env.*
+secrets.json
+
+# Node (in case you add a frontend later or serve files through WebAPI)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+###############################################
+#       DOCKER / COMPOSE
+###############################################
+docker-compose.override.yml
+docker-compose.local.yml
+
+###############################################
+#       TEST PROJECTS
+###############################################
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+###############################################
+#       FRONTEND BUILDS (if coexist in solution)
+###############################################
+dist/
+build/
+
+###############################################
+#       OTHER FILES TO IGNORE
+###############################################
+*.cache
+*.pid
+*.swp
+*.lock
+*.tmp
+*.bak
+
+################################################
+#       PDF or Excel temporary output
+################################################
+*.pdf
+*.xlsx
+*.xls
+exports/
+output/
+
+.git/
+.gitignore
+
+
+################################################
+#       OPTIONAL: ignore static assets if not needed
+#       (remove if your WebAPI serves files from wwwroot)
+################################################
+#wwwroot/

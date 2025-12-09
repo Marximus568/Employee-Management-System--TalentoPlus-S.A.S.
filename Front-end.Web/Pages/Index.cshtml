@@ -1,0 +1,91 @@
+@page
+@model Front_end.Web.Pages.IndexModel
+
+
+<div class="header">
+    <div class="container">
+        <div class="header-content">
+            <a href="/" class="header-brand">
+                <i class="fas fa-bolt"></i>
+                Express Firmeza
+            </a>
+            <nav>
+                <ul class="header-nav">
+                    <li><a href="/" class="header-nav-link">Home</a></li>
+                    <li><a href="/login" class="btn btn-primary btn-sm">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1 class="hero-title">Welcome to Express Firmeza</h1>
+        <p class="hero-subtitle">Professional business management platform with AI-powered insights</p>
+        <div class="hero-actions">
+            <a href="/login" class="btn btn-primary btn-lg">
+                <i class="fas fa-sign-in-alt"></i>
+                Get Started
+            </a>
+            <a href="#features" class="btn btn-outline btn-lg">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div id="features" class="grid grid-3" style="margin-top: 3rem;">
+        <div class="card">
+            <div class="card-body">
+                <div style="font-size: 2.5rem; color: var(--color-primary); margin-bottom: 1rem;">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="card-title">AI Assistant</h3>
+                <p style="color: var(--color-gray-600);">
+                    Powered by Google Gemini AI to help you make smarter business decisions
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div style="font-size: 2.5rem; color: var(--color-success); margin-bottom: 1rem;">
+                    <i class="fas fa-file-excel"></i>
+                </div>
+                <h3 class="card-title">Excel Import</h3>
+                <p style="color: var(--color-gray-600);">
+                    Easily import your data from Excel spreadsheets with one click
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div style="font-size: 2.5rem; color: var(--color-danger); margin-bottom: 1rem;">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <h3 class="card-title">PDF Reports</h3>
+                <p style="color: var(--color-gray-600);">
+                    Generate professional PDF reports and export your data instantly
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Info Section -->
+    <div class="card" style="margin-top: 3rem;">
+        <div class="card-body text-center">
+            <h2 style="margin-bottom: 1rem;">Ready to streamline your business?</h2>
+            <p style="color: var(--color-gray-600); font-size: 1.125rem; margin-bottom: 2rem;">
+                Join thousands of businesses using Express Firmeza to manage their operations efficiently
+            </p>
+            <a href="/login" class="btn btn-primary btn-lg">
+                <i class="fas fa-rocket"></i>
+                Start Now
+            </a>
+        </div>
+    </div>
+</div>

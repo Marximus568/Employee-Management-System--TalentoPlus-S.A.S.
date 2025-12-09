@@ -1,0 +1,186 @@
+@page
+@model Front_end.Web.Pages.Dashboard.AIChatModel
+@{
+    ViewData["Title"] = "AI Chat";
+    Layout = "_Layout";
+}
+
+<style>
+    .chat-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .chat-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px 12px 0 0;
+        text-align: center;
+    }
+
+    .chat-header h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .chat-body {
+        background: white;
+        padding: 2rem;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .message-box {
+        margin-bottom: 1.5rem;
+    }
+
+    .message-box label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .message-input {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .message-input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+    .send-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .send-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .response-box {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+
+    .response-box h3 {
+        margin-top: 0;
+        color: #667eea;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .response-content {
+        line-height: 1.6;
+        color: #333;
+    }
+
+    .error-box {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #fee;
+        border-radius: 8px;
+        border-left: 4px solid #e74c3c;
+        color: #c0392b;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #667eea;
+        text-decoration: none;
+        margin-bottom: 1rem;
+        font-weight: 500;
+        transition: gap 0.3s;
+    }
+
+    .back-link:hover {
+        gap: 0.75rem;
+    }
+</style>
+
+<div class="chat-container">
+    <a href="/Dashboard/Index" class="back-link">
+        <i class="fas fa-arrow-left"></i>
+        Back to Dashboard
+    </a>
+
+    <div class="chat-header">
+        <h1>
+            <i class="fas fa-robot"></i>
+            AI Chat Assistant
+        </h1>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Powered by Google Gemini</p>
+    </div>
+
+    <div class="chat-body">
+        <form method="post">
+            <div class="message-box">
+                <label for="UserMessage">
+                    <i class="fas fa-comment"></i> Your Message
+                </label>
+                <textarea 
+                    asp-for="UserMessage" 
+                    class="message-input" 
+                    placeholder="Type your message here... Ask me anything!"
+                    required
+                ></textarea>
+            </div>
+
+            <button type="submit" class="send-btn">
+                <i class="fas fa-paper-plane"></i>
+                Send Message
+            </button>
+        </form>
+
+        @if (!string.IsNullOrEmpty(Model.AiResponse))
+        {
+            <div class="response-box">
+                <h3>
+                    <i class="fas fa-robot"></i>
+                    AI Response
+                </h3>
+                <div class="response-content">
+                    @Model.AiResponse
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="error-box">
+                <strong><i class="fas fa-exclamation-triangle"></i> Error:</strong><br/>
+                @Model.ErrorMessage
+            </div>
+        }
+    </div>
+</div>

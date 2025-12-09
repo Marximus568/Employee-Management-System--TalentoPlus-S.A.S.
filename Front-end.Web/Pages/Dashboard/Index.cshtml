@@ -1,0 +1,190 @@
+@page
+@model Front_end.Web.Pages.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_Layout";
+}
+
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-bolt logo-icon"></i>
+            <span>Express Firmeza</span>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="/Dashboard/Index" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/Dashboard/AIChat" class="nav-item">
+                <i class="fas fa-robot"></i>
+                <span>AI Chat</span>
+            </a>
+            <a href="/Dashboard/PDF/Index" class="nav-item">
+                <i class="fas fa-file-pdf"></i>
+                <span>PDF Generation</span>
+            </a>
+            <a href="/Dashboard/Excel/Index" class="nav-item">
+                <i class="fas fa-file-excel"></i>
+                <span>Excel Reports</span>
+            </a>
+            <a href="/Dashboard/CRUD/Index" class="nav-item">
+                <i class="fas fa-database"></i>
+                <span>Data Management</span>
+            </a>
+            <a href="/Dashboard/Reports/Index" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+            <a href="/Dashboard/Settings/Index" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <span class="user-name">@Model.UserName</span>
+                    <span class="user-role">@Model.UserRole</span>
+                </div>
+            </div>
+            <form method="post" action="/Logout" class="logout-form">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="top-bar-actions">
+                <button class="action-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-envelope"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <div class="welcome-section">
+                <h1>Welcome back, @Model.UserName!</h1>
+                <p>Here's what's happening with your projects today.</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon pdf">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>PDF Documents</h3>
+                        <p class="stat-value">128</p>
+                        <p class="stat-change positive">+12% this week</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon excel">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Excel Sheets</h3>
+                        <p class="stat-value">45</p>
+                        <p class="stat-change positive">+5% this week</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Users</h3>
+                        <p class="stat-value">1,240</p>
+                        <p class="stat-change positive">+18% this month</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon revenue">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Revenue</h3>
+                        <p class="stat-value">$45,200</p>
+                        <p class="stat-change negative">-2% this week</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <h2 class="section-title">Quick Actions</h2>
+            <div class="actions-grid">
+                <a href="/Dashboard/PDF/Index" class="action-card">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Generate PDF</span>
+                </a>
+                <a href="/Dashboard/Excel/Index" class="action-card">
+                    <i class="fas fa-file-excel"></i>
+                    <span>Export Excel</span>
+                </a>
+                <a href="/Dashboard/CRUD/Index" class="action-card">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add New Record</span>
+                </a>
+                <a href="/Dashboard/Reports/Index" class="action-card">
+                    <i class="fas fa-chart-line"></i>
+                    <span>View Reports</span>
+                </a>
+            </div>
+
+            <!-- Recent Activity -->
+            <h2 class="section-title">Recent Activity</h2>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="activity-details">
+                        <h4>Project Alpha Completed</h4>
+                        <p>The project was successfully delivered to the client.</p>
+                    </div>
+                    <span class="activity-time">2h ago</span>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon warning">
+                        <i class="fas fa-exclamation"></i>
+                    </div>
+                    <div class="activity-details">
+                        <h4>Server Maintenance</h4>
+                        <p>Scheduled maintenance for tonight at 02:00 AM.</p>
+                    </div>
+                    <span class="activity-time">5h ago</span>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon info">
+                        <i class="fas fa-info"></i>
+                    </div>
+                    <div class="activity-details">
+                        <h4>New User Registration</h4>
+                        <p>Sarah Smith joined the team.</p>
+                    </div>
+                    <span class="activity-time">1d ago</span>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

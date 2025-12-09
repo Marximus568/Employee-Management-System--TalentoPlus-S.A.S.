@@ -1,0 +1,86 @@
+@page
+@model Front_end.Web.Pages.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="flex-center" style="min-height: 100vh; background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-gray-200) 100%);">
+    <div class="card" style="width: 100%; max-width: 450px; margin: 2rem;">
+        <div class="card-body text-center">
+            <!-- Logo/Brand -->
+            <div style="font-size: 3rem; color: var(--color-primary); margin-bottom: 1rem;">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <h2 style="margin-bottom: 0.5rem;">Welcome Back</h2>
+            <p style="color: var(--color-gray-600); margin-bottom: 2rem;">Sign in to your Express Firmeza account</p>
+
+            <!-- Login Form -->
+            <form method="post" style="text-align: left;">
+                <div class="form-group">
+                    <label asp-for="Input.Email" class="form-label">
+                        <i class="fas fa-envelope" style="margin-right: 0.5rem;"></i>
+                        Email Address
+                    </label>
+                    <input asp-for="Input.Email" 
+                           type="email" 
+                           class="form-control" 
+                           placeholder="you@example.com"
+                           required />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Input.Password" class="form-label">
+                        <i class="fas fa-lock" style="margin-right: 0.5rem;"></i>
+                        Password
+                    </label>
+                    <input asp-for="Input.Password" 
+                           type="password" 
+                           class="form-control" 
+                           placeholder="Enter your password"
+                           required />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+
+                <div class="flex-between" style="margin-bottom: 1.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" asp-for="Input.RememberMe" />
+                        <span style="font-size: 0.875rem; color: var(--color-gray-600);">Remember me</span>
+                    </label>
+                    <a href="#" style="font-size: 0.875rem;">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div style="padding: 1rem; background-color: #fee; border-radius: 0.5rem; color: var(--color-danger); font-size: 0.875rem;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        @Model.ErrorMessage
+                    </div>
+                }
+            </form>
+
+            <!-- Divider -->
+            <div style="margin: 2rem 0; text-align: center; position: relative;">
+                <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background-color: var(--color-gray-300);"></div>
+                <span style="position: relative; background-color: white; padding: 0 1rem; color: var(--color-gray-500); font-size: 0.875rem;">
+                    New to Express Firmeza?
+                </span>
+            </div>
+
+            <!-- Sign Up Link -->
+            <a href="#" class="btn btn-outline" style="width: 100%;">
+                <i class="fas fa-user-plus"></i>
+                Create Account
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
