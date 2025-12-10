@@ -7,7 +7,7 @@ using IAuthenticationService = Application.Interfaces.Identity.IAuthenticationSe
 
 namespace Front_end.Web.Pages.Dashboard;
 
-[Authorize(Roles = "Admin")]
+
 public class IndexModel : PageModel
 {
     private readonly Application.Interfaces.Identity.IAuthenticationService _authService;
