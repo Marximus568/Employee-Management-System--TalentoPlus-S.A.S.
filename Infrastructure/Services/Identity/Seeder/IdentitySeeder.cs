@@ -2,11 +2,8 @@ using Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Services.Identity;
+namespace Infrastructure.Services.Identity.Seeder;
 
-/// <summary>
-/// Seeds initial users and roles for testing
-/// </summary>
 public static class IdentitySeeder
 {
     public static async Task SeedAsync(IServiceProvider serviceProvider)
@@ -40,14 +37,20 @@ public static class IdentitySeeder
                     CreatedAt = DateTime.UtcNow
                 };
 
-                await roleManager.CreateAsync(role);
+                var result = await roleManager.CreateAsync(role);
+                Console.WriteLine(result.Succeeded
+                    ? $"Role '{roleName}' created successfully."
+                    : $"Failed to create role '{roleName}': {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
+            else
+            {
+                Console.WriteLine($"Role '{roleName}' already exists.");
             }
         }
     }
 
     private static async Task SeedUsersAsync(UserManager<ApplicationUser> userManager)
     {
-        // Seed Admin User
         await SeedUserAsync(
             userManager,
             email: "admin@expressfirmeza.com",
@@ -58,7 +61,6 @@ public static class IdentitySeeder
             role: "Admin"
         );
 
-        // Seed Regular User
         await SeedUserAsync(
             userManager,
             email: "user@expressfirmeza.com",
@@ -90,15 +92,33 @@ public static class IdentitySeeder
                 EmailConfirmed = true,
                 FirstName = firstName,
                 LastName = lastName,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true
             };
 
             var result = await userManager.CreateAsync(user, password);
-
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, role);
+                Console.WriteLine($"User '{email}' created and assigned to role '{role}'.");
             }
+            else
+            {
+                Console.WriteLine($"Failed to create user '{email}': {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
+        }
+        else
+        {
+          
+            var token = await userManager.GeneratePasswordResetTokenAsync(existingUser);
+            await userManager.ResetPasswordAsync(existingUser, token, password);
+
+            if (!await userManager.IsInRoleAsync(existingUser, role))
+            {
+                await userManager.AddToRoleAsync(existingUser, role);
+            }
+
+            Console.WriteLine($"User '{email}' already exists. Password reset and role ensured.");
         }
     }
 }

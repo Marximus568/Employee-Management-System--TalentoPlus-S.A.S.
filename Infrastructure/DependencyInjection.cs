@@ -8,6 +8,7 @@ using Infrastructure.Services;
 using Infrastructure.Services.EmployeeService;
 using Infrastructure.Services.Identity;
 using Infrastructure.Services.Identity.Interface;
+using Infrastructure.Services.Identity.Seeder;
 using Infrastructure.Services.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;

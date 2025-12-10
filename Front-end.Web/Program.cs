@@ -2,6 +2,7 @@ using Application;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
+using System.IO;
 
 // Load environment variables from .env file
 DotNetEnv.Env.Load("../.env");
@@ -12,28 +13,43 @@ var builder = WebApplication.CreateBuilder(args);
 // LAYER DEPENDENCY INJECTION
 // ========================================
 
-// Add Application layer services
+// Add Application layer services (business logic, DTOs, interfaces)
 builder.Services.AddApplication();
 
-// Cookies Authentication
+// Add Infrastructure layer services (Database context, Identity, Authentication)
+builder.Services.AddInfrastructure(builder.Configuration);
+
+// ========================================
+// AUTHENTICATION CONFIGURATION
+// ========================================
+
+// Configure cookie authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Login"; // Path to login page
+        options.LoginPath = "/Login";        // Redirect here if user is not authenticated
+        options.LogoutPath = "/Logout";      // Optional logout path
+        options.AccessDeniedPath = "/AccessDenied"; // Optional access denied page
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.SlidingExpiration = true;
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest;
     });
-// Add Infrastructure layer services (Database, Identity, Authentication)
-builder.Services.AddInfrastructure(builder.Configuration);
 
-// Data Protection for cookie encryption
+// Data Protection for cookie encryption, key persistence
 builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(@"/app/keys"))
+    .PersistKeysToFileSystem(new DirectoryInfo(@"/app/keys")) // Ensure folder exists in Docker
     .SetApplicationName("FrontEnd.Web");
 
 // ========================================
 // PRESENTATION LAYER SERVICES
 // ========================================
+
+// Add Razor Pages services
 builder.Services.AddRazorPages();
+
+// Optional: HttpContext accessor for accessing user info in services
 builder.Services.AddHttpContextAccessor();
 
 // ========================================
@@ -47,6 +63,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    // Seed database with initial data (e.g., admin user)
     await Infrastructure.DependencyInjection.SeedDatabaseAsync(services);
 }
 
@@ -59,13 +76,15 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
 
-// Authentication & Authorization middleware
+// Add Authentication & Authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map Razor Pages
+// Map Razor Pages routes
 app.MapRazorPages();
 
+// Run the application
 app.Run();

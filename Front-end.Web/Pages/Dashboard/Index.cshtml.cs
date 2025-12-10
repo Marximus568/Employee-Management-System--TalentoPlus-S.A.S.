@@ -3,10 +3,11 @@ using Application.Interfaces.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using IAuthenticationService = Application.Interfaces.Identity.IAuthenticationService;
 
 namespace Front_end.Web.Pages.Dashboard;
 
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class IndexModel : PageModel
 {
     private readonly Application.Interfaces.Identity.IAuthenticationService _authService;
@@ -14,7 +15,7 @@ public class IndexModel : PageModel
     public string UserName { get; set; } = "User";
     public string UserRole { get; set; } = "User";
 
-    public IndexModel(Application.Interfaces.Identity.IAuthenticationService authService)
+    public IndexModel(IAuthenticationService authService)
     {
         _authService = authService;
     }
@@ -25,7 +26,7 @@ public class IndexModel : PageModel
         if (user != null)
         {
             UserName = user.FullName;
-            // You can get role from UserManager if needed
+            UserRole = user.Role;
         }
     }
 }

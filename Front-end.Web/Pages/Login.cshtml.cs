@@ -30,6 +30,7 @@ namespace Front_end.Web.Pages
             if (!ModelState.IsValid)
                 return Page();
 
+            // Attempt login
             var result = await _authService.LoginAsync(Input);
 
             if (!result.Success)
@@ -43,8 +44,7 @@ namespace Front_end.Web.Pages
             {
                 new Claim(ClaimTypes.NameIdentifier, result.UserId),
                 new Claim(ClaimTypes.Name, result.FullName ?? Input.Email),
-                // Add roles if available
-                // new Claim(ClaimTypes.Role, result.Role)
+                new Claim(ClaimTypes.Role, result.Role) // Add role claim
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -62,7 +62,15 @@ namespace Front_end.Web.Pages
                 authProperties
             );
 
-            return RedirectToPage("/Dashboard/Index");
+            // Optional: redirect based on role
+            if (result.Role == "Admin")
+            {
+                return RedirectToPage("/Dashboard/Index"); // Admin dashboard
+            }
+            else
+            {
+                return RedirectToPage("/Index"); // Regular user home
+            }
         }
     }
 }

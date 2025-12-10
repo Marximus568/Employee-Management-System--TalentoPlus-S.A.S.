@@ -12,6 +12,30 @@ namespace Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // --- SEED ADMIN ---
+            var adminRoleId = 1;
+            var adminUserId = 1;
+
+// Insert role Admin
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "Description", "CreatedAt", "Name", "NormalizedName", "ConcurrencyStamp" },
+                values: new object[] { adminRoleId, "Administrator with full access", DateTime.UtcNow, "Admin", "ADMIN", "1" }
+            );
+
+// Insert user Admin (password en texto plano: Admin@123)
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "FirstName", "LastName", "CreatedAt", "IsActive", "UserName", "NormalizedUserName", "Email", "NormalizedEmail", "EmailConfirmed", "PasswordHash", "SecurityStamp" },
+                values: new object[] { adminUserId, "Admin", "User", DateTime.UtcNow, true, "admin@expressfirmeza.com", "ADMIN@EXPRESSFIRMEZA.COM", "admin@expressfirmeza.com", "ADMIN@EXPRESSFIRMEZA.COM", true, "Admin@123", "1" }
+            );
+
+// Asignar rol Admin al usuario
+            migrationBuilder.InsertData(
+                table: "UserRoles",
+                columns: new[] { "UserId", "RoleId" },
+                values: new object[] { adminUserId, adminRoleId }
+            );
             migrationBuilder.CreateTable(
                 name: "Departments",
                 columns: table => new
@@ -94,6 +118,7 @@ namespace Infrastructure.Migrations
                     HireDate = table.Column<DateOnly>(type: "date", nullable: true),
                     Status = table.Column<string>(type: "text", nullable: true),
                     DepartmentId = table.Column<int>(type: "integer", nullable: true),
+                    ProfessionalProfile = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false)

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251209233014_Database")]
+    [Migration("20251210004209_Database")]
     partial class Database
     {
         /// <inheritdoc />
@@ -425,6 +425,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("Position")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProfessionalProfile")
                         .IsRequired()
                         .HasColumnType("text");
 
