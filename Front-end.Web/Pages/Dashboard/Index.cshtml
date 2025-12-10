@@ -13,33 +13,33 @@
 <!-- Stats Grid -->
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-icon pdf">
-            <i class="fas fa-file-pdf"></i>
-        </div>
-        <div class="stat-info">
-            <h3>PDF Documents</h3>
-            <p class="stat-value">128</p>
-            <p class="stat-change positive">+12% this week</p>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon excel">
-            <i class="fas fa-file-excel"></i>
-        </div>
-        <div class="stat-info">
-            <h3>Excel Sheets</h3>
-            <p class="stat-value">45</p>
-            <p class="stat-change positive">+5% this week</p>
-        </div>
-    </div>
-    <div class="stat-card">
         <div class="stat-icon users">
             <i class="fas fa-users"></i>
         </div>
         <div class="stat-info">
             <h3>Total Users</h3>
-            <p class="stat-value">1,240</p>
-            <p class="stat-change positive">+18% this month</p>
+            <p class="stat-value">@Model.TotalUsers</p>
+            <p class="stat-change positive">Registered in system</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon excel">
+            <i class="fas fa-user-check"></i>
+        </div>
+        <div class="stat-info">
+            <h3>Active Users</h3>
+            <p class="stat-value">@Model.ActiveUsers</p>
+            <p class="stat-change positive">Currently active</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon pdf">
+            <i class="fas fa-user-times"></i>
+        </div>
+        <div class="stat-info">
+            <h3>Inactive Users</h3>
+            <p class="stat-value">@Model.InactiveUsers</p>
+            <p class="stat-change negative">Account disabled</p>
         </div>
     </div>
     <div class="stat-card">
