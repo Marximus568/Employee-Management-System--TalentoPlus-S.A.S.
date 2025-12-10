@@ -62,13 +62,7 @@
             <p>Import multiple records at once using a standard Excel template.</p>
             
             <form method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label class="form-label">Import Type</label>
-                    <select class="form-control">
-                        <option>New Employees</option>
-                        <option>Update Salaries</option>
-                    </select>
-                </div>
+                <!-- Import Type Selector Removed -->
                 <div class="form-group">
                     <label class="form-label">Upload File</label>
                     <input type="file" asp-for="Upload" class="form-control" accept=".xlsx" style="padding: 10px; height: auto;" />
@@ -82,37 +76,5 @@
                 </div>
             </form>
         </div>
-    </div>
-</div>
-
-<div class="card mt-4">
-    <div class="card-header">
-        <h3 class="card-title">Recent Exports</h3>
-    </div>
-    <div class="card-body">
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="border-bottom: 2px solid var(--color-gray-100);">
-                    <th class="text-left p-2">File Name</th>
-                    <th class="text-left p-2">Type</th>
-                    <th class="text-left p-2">Date</th>
-                    <th class="text-left p-2">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr style="border-bottom: 1px solid var(--color-gray-50);">
-                    <td class="p-2"> <i class="fas fa-file-excel" style="color: var(--color-success); margin-right: 5px;"></i> All_Employees_v2.xlsx</td>
-                    <td class="p-2">Export</td>
-                    <td class="p-2">Today, 10:30 AM</td>
-                    <td class="p-2"><span style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">Completed</span></td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--color-gray-50);">
-                    <td class="p-2"> <i class="fas fa-file-excel" style="color: var(--color-success); margin-right: 5px;"></i> Sales_Q3_Data.xlsx</td>
-                    <td class="p-2">Export</td>
-                    <td class="p-2">Yesterday</td>
-                    <td class="p-2"><span style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">Completed</span></td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 </div>

@@ -36,7 +36,7 @@ public class ExcelService : IExcelService
             if(!string.IsNullOrEmpty(header)) headerMap[header] = col;
         }
 
-        // 2. Read all rows into memory to avoid repeated DB calls and handle duplicates within file
+        // 2. Read all rows into memory
         var importData = new List<ImportRow>();
         for (int row = 2; row <= rowCount; row++)
         {
@@ -55,7 +55,7 @@ public class ExcelService : IExcelService
                 Department = GetValue(worksheet, row, headerMap, "departamento", "department", "area"),
                 Salary = GetValue(worksheet, row, headerMap, "salario", "salary"),
                 Position = GetValue(worksheet, row, headerMap, "cargo", "position", "rol"),
-                HireDate = GetValue(worksheet, row, headerMap, "fechaingreso", "hiredate", "fecha de ingreso"),
+                HireDate = GetValue(worksheet, row, headerMap, "fechaingreso", "hiredate", "fecha de ingreso", "fechaingre"),
                 BirthDate = GetValue(worksheet, row, headerMap, "fechanacimiento", "birthdate", "fecha de nacimiento"),
                 Status = GetValue(worksheet, row, headerMap, "estado", "status"),
                 EducationLevel = GetValue(worksheet, row, headerMap, "niveleducativo", "educationlevel", "education", "nivel educativo"),
@@ -65,60 +65,58 @@ public class ExcelService : IExcelService
 
         if(!importData.Any()) return;
 
-        // 3. Bulk Fetch Existing Data
-        var documents = importData.Select(d => d.Document).Distinct().ToList();
-        
-        // We query Employees directly to ensure we get the derived type data if available
-        // But we really need to check if ANY Person with that document exists.
-        var existingPersons = await _context.Persons
-            .Include(p => (p as Employee).EducationRecords)
-            .Where(p => documents.Contains(p.Document))
-            .ToDictionaryAsync(p => p.Document);
+        // 3. Process Departments FIRST (Save them to get IDs)
+        var distinctDeptNames = importData
+            .Select(d => d.Department)
+            .Where(d => !string.IsNullOrEmpty(d))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
 
-        var allDepartmentNames = importData.Select(d => d.Department).Where(d => !string.IsNullOrEmpty(d)).Distinct().ToList();
-        
-        // Fetch departments and create a case-insensitive dictionary
-        var dbDepartments = await _context.Departments.ToListAsync();
-        var existingDepartments = new Dictionary<string, Department>(StringComparer.OrdinalIgnoreCase);
-        foreach (var dept in dbDepartments)
+        var existingDepartments = await _context.Departments
+            .Where(d => distinctDeptNames.Contains(d.Name))
+            .ToListAsync();
+            
+        var deptMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (var d in existingDepartments) deptMap[d.Name] = d.Id;
+
+        var newDepartments = new List<Department>();
+        foreach (var name in distinctDeptNames)
         {
-            if (!existingDepartments.ContainsKey(dept.Name))
+            if (!deptMap.ContainsKey(name))
             {
-                existingDepartments[dept.Name] = dept;
+                var newDept = new Department { Name = name };
+                newDepartments.Add(newDept);
             }
         }
 
-        // 4. Process Rows
-        var newDepartments = new Dictionary<string, Department>(StringComparer.OrdinalIgnoreCase);
+        if (newDepartments.Any())
+        {
+            _context.Departments.AddRange(newDepartments);
+            await _context.SaveChangesAsync(); // Save to generate IDs
+            
+            foreach (var d in newDepartments) deptMap[d.Name] = d.Id;
+        }
+
+        // 4. Process Employees
+        var documents = importData.Select(d => d.Document).Distinct().ToList();
+        var existingEmployees = await _context.Employees
+            .Include(e => e.EducationRecords)
+            .Where(e => documents.Contains(e.Document))
+            .ToDictionaryAsync(e => e.Document);
 
         foreach (var row in importData)
         {
-            // Resolve Department
-            Department? department = null;
-            if (!string.IsNullOrEmpty(row.Department))
+            // Resolve Department ID
+            int? departmentId = null;
+            if (!string.IsNullOrEmpty(row.Department) && deptMap.TryGetValue(row.Department, out int did))
             {
-                if (existingDepartments.TryGetValue(row.Department, out var dept))
-                {
-                    department = dept;
-                }
-                else if (newDepartments.TryGetValue(row.Department, out var newDept))
-                {
-                    department = newDept;
-                }
-                else
-                {
-                    department = new Department { Name = row.Department }; // Description removed
-                    newDepartments[row.Department] = department;
-                    _context.Departments.Add(department);
-                }
+                departmentId = did;
             }
 
-            // Resolve Person / Employee
-             Employee employee;
-
-            if (!existingPersons.TryGetValue(row.Document, out var person))
+            Employee employee;
+            if (!existingEmployees.TryGetValue(row.Document, out var existingEmp))
             {
-                // Create NEW Employee (since Person is abstract)
+                // Create NEW Employee
                 employee = new Employee
                 {
                     Document = row.Document,
@@ -132,27 +130,19 @@ public class ExcelService : IExcelService
                     EducationRecords = new List<EmployeeEducation>()
                 };
                 
+                if (departmentId.HasValue) employee.DepartmentId = departmentId.Value;
+
                 _context.Employees.Add(employee);
-                existingPersons[row.Document] = employee; // Track
+                existingEmployees[row.Document] = employee;
             }
             else
             {
+                employee = existingEmp;
                 // Update Existing
-                if (!string.IsNullOrEmpty(row.Email)) person.Email = row.Email;
-                if (!string.IsNullOrEmpty(row.Phone)) person.Phone = row.Phone;
-                if (!string.IsNullOrEmpty(row.Address)) person.Address = row.Address;
-                
-                if (person is Employee emp)
-                {
-                    employee = emp;
-                }
-                else
-                {
-                    // Person exists but is NOT an employee (e.g. Client). 
-                    // Cannot easily convert. Skip Employee-specific updates or log warning.
-                    // For now, continue to next row or skip employee specific logic
-                    continue; 
-                }
+                if (!string.IsNullOrEmpty(row.Email)) employee.Email = row.Email;
+                if (!string.IsNullOrEmpty(row.Phone)) employee.Phone = row.Phone;
+                if (!string.IsNullOrEmpty(row.Address)) employee.Address = row.Address;
+                if (departmentId.HasValue) employee.DepartmentId = departmentId.Value;
             }
 
             // Update Employee fields
@@ -165,8 +155,6 @@ public class ExcelService : IExcelService
             
             if (DateTime.TryParse(row.BirthDate, out var bd)) 
                 employee.BirthDate = DateOnly.FromDateTime(bd);
-
-            if (department != null) employee.Department = department;
 
             // Resolve Education
             if (!string.IsNullOrEmpty(row.EducationLevel))

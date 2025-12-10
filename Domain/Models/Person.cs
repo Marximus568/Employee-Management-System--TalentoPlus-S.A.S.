@@ -16,7 +16,4 @@ public abstract class Person : BaseEntity
     public string Address { get; set; }  = string.Empty;  
     public string Phone { get; set; }
     public string Email { get; set; }
-
-    // Navigation: One Person → One Employee
-    public Employee Employee { get; set; }
 }
