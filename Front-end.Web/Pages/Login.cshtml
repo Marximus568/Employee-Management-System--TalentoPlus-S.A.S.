@@ -5,7 +5,7 @@
 }
 
 <div class="flex-center" style="min-height: 100vh; background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-gray-200) 100%);">
-    <div class="card" style="width: 100%; max-width: 450px; margin: 2rem;">
+    <div class="card fade-in-up" style="width: 100%; max-width: 450px; margin: 2rem;">
         <div class="card-body text-center">
             <!-- Logo/Brand -->
             <div style="font-size: 3rem; color: var(--color-primary); margin-bottom: 1rem;">
@@ -53,18 +53,18 @@
 
                 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
                 {
-                    <div style="padding: 1rem; background-color: #fee; border-radius: 0.5rem; color: var(--color-danger); font-size: 0.875rem;">
-                        <i class="fas fa-exclamation-circle"></i>
+                    <div style="padding: 1rem; background-color: #fee; border-radius: 0.5rem; color: var(--color-danger); font-size: 0.875rem; margin-bottom: 1rem;">
+                        <i class="fas fa-exclamation-circle" style="margin-right: 5px;"></i>
                         @Model.ErrorMessage
                     </div>
                 }
             </form>
 
             <!-- Divider -->
-            <div style="margin: 2rem 0; text-align: center; position: relative;">
-                <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background-color: var(--color-gray-300);"></div>
-                <span style="position: relative; background-color: white; padding: 0 1rem; color: var(--color-gray-500); font-size: 0.875rem;">
-                    New to Express Firmeza?
+            <div style="margin: 1.5rem 0; text-align: center; position: relative;">
+                <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background-color: var(--color-gray-200);"></div>
+                <span style="position: relative; background-color: white; padding: 0 1rem; color: var(--color-gray-500); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Or
                 </span>
             </div>
 
@@ -76,6 +76,21 @@
         </div>
     </div>
 </div>
+
+<style>
+    .fade-in-up {
+        animation: fadeInUp 0.5s ease-out forwards;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    @@keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

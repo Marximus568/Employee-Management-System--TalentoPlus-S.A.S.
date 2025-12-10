@@ -2,10 +2,110 @@
 @model Front_end.Web.Pages.Dashboard.Excel.IndexModel
 @{
     ViewData["Title"] = "Excel Reports";
-    Layout = "_Layout";
+    Layout = "_DashboardLayout";
 }
 
-<div class="dashboard-container">
-    <h1>Excel Reports</h1>
-    <p>Generate and manage Excel spreadsheets here.</p>
+<div class="mb-4">
+    <h1>Excel Management</h1>
+    <p style="color: var(--color-gray-500);">Export data to Excel or import records in bulk.</p>
+</div>
+
+<div class="grid grid-2">
+    <!-- Data Export Card -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-file-export" style="color: var(--color-success); margin-right: 10px;"></i>
+                Data Export
+            </h3>
+        </div>
+        <div class="card-body">
+            <p>Export system data to Excel format (.xlsx) for analysis.</p>
+            <div class="form-group">
+                <label class="form-label">Data Source</label>
+                <select class="form-control">
+                    <option>Employees</option>
+                    <option>Departments</option>
+                    <option>Attendance Records</option>
+                    <option>Sales Data</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Include Inactive Records</label>
+                <div class="flex-center" style="justify-content: flex-start; gap: 10px;">
+                    <input type="checkbox" id="includeInactive" style="width: 20px; height: 20px;">
+                    <label for="includeInactive" style="margin: 0; font-weight: normal;">Yes, include inactive</label>
+                </div>
+            </div>
+            <button class="btn btn-success" style="width: 100%; background-color: #10b981; border-color: #10b981; color: white;">
+                <i class="fas fa-file-excel"></i> Export to Excel
+            </button>
+        </div>
+    </div>
+
+    <!-- Bulk Import Card -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-file-import" style="color: var(--color-primary); margin-right: 10px;"></i>
+                Bulk Import
+            </h3>
+        </div>
+        <div class="card-body">
+            <p>Import multiple records at once using a standard Excel template.</p>
+            <div class="form-group">
+                <label class="form-label">Import Type</label>
+                <select class="form-control">
+                    <option>New Employees</option>
+                    <option>Update Salaries</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Upload File</label>
+                <div style="border: 2px dashed var(--color-gray-300); padding: 20px; text-align: center; border-radius: var(--border-radius-md); cursor: pointer; transition: border-color 0.2s;">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--color-gray-400); margin-bottom: 10px;"></i>
+                    <p style="margin: 0; color: var(--color-gray-500);">Click to upload or drag and drop</p>
+                    <p style="margin: 0; font-size: 0.8rem; color: var(--color-gray-400);">.xlsx, .csv files only</p>
+                </div>
+            </div>
+            <div class="flex-between">
+                <a href="#" style="font-size: 0.9rem; text-decoration: underline;">Download Template</a>
+                <button class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Import
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h3 class="card-title">Recent Exports</h3>
+    </div>
+    <div class="card-body">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--color-gray-100);">
+                    <th class="text-left p-2">File Name</th>
+                    <th class="text-left p-2">Type</th>
+                    <th class="text-left p-2">Date</th>
+                    <th class="text-left p-2">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid var(--color-gray-50);">
+                    <td class="p-2"> <i class="fas fa-file-excel" style="color: var(--color-success); margin-right: 5px;"></i> All_Employees_v2.xlsx</td>
+                    <td class="p-2">Export</td>
+                    <td class="p-2">Today, 10:30 AM</td>
+                    <td class="p-2"><span style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">Completed</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-gray-50);">
+                    <td class="p-2"> <i class="fas fa-file-excel" style="color: var(--color-success); margin-right: 5px;"></i> Sales_Q3_Data.xlsx</td>
+                    <td class="p-2">Export</td>
+                    <td class="p-2">Yesterday</td>
+                    <td class="p-2"><span style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">Completed</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

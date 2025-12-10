@@ -2,10 +2,124 @@
 @model Front_end.Web.Pages.Dashboard.Settings.IndexModel
 @{
     ViewData["Title"] = "Settings";
-    Layout = "_Layout";
+    Layout = "_DashboardLayout";
 }
 
-<div class="dashboard-container">
+<div class="mb-4">
     <h1>Settings</h1>
-    <p>Manage application settings here.</p>
+    <p style="color: var(--color-gray-500);">Manage your account and application preferences.</p>
+</div>
+
+<div class="grid grid-2">
+    <!-- Profile Settings -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Profile Settings</h3>
+        </div>
+        <div class="card-body">
+            <div class="flex-center mb-4" style="justify-content: flex-start; gap: 20px;">
+                <div style="width: 80px; height: 80px; background: var(--color-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem;">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline">Change Avatar</button>
+                </div>
+            </div>
+            
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" value="Admin User">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-control" value="admin@expressfirmeza.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <input type="text" class="form-control" value="Administrator" disabled style="background-color: var(--color-gray-100);">
+                </div>
+                <button class="btn btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Security Settings -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Security</h3>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-control">
+                </div>
+                <button class="btn btn-primary">Update Password</button>
+            </form>
+            
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--color-gray-200);">
+                <h4 style="font-size: 1rem; margin-bottom: 1rem;">Two-Factor Authentication</h4>
+                <div class="flex-between">
+                    <p style="margin: 0; color: var(--color-gray-600);">Secure your account with 2FA.</p>
+                    <button class="btn btn-sm btn-outline">Enable 2FA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notifications -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Notifications</h3>
+        </div>
+        <div class="card-body">
+            <div class="form-group flex-between">
+                <label style="margin: 0;">Email Alerts</label>
+                <input type="checkbox" checked style="width: 20px; height: 20px;">
+            </div>
+            <div class="form-group flex-between">
+                <label style="margin: 0;">Push Notifications</label>
+                <input type="checkbox" checked style="width: 20px; height: 20px;">
+            </div>
+            <div class="form-group flex-between">
+                <label style="margin: 0;">Weekly Reports</label>
+                <input type="checkbox" style="width: 20px; height: 20px;">
+            </div>
+            <button class="btn btn-primary mt-2">Save Preferences</button>
+        </div>
+    </div>
+    
+    <!-- System Preferences -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">System</h3>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label class="form-label">Language</label>
+                <select class="form-control">
+                    <option>English (US)</option>
+                    <option>Spanish</option>
+                    <option>Portuguese</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Time Zone</label>
+                <select class="form-control">
+                    <option>(UTC-05:00) Eastern Time (US & Canada)</option>
+                    <option>(UTC+00:00) UTC</option>
+                </select>
+            </div>
+            <button class="btn btn-primary">Save System Settings</button>
+        </div>
+    </div>
 </div>
