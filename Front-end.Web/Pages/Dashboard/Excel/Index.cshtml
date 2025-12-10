@@ -52,28 +52,35 @@
             </h3>
         </div>
         <div class="card-body">
-            <p>Import multiple records at once using a standard Excel template.</p>
-            <div class="form-group">
-                <label class="form-label">Import Type</label>
-                <select class="form-control">
-                    <option>New Employees</option>
-                    <option>Update Salaries</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Upload File</label>
-                <div style="border: 2px dashed var(--color-gray-300); padding: 20px; text-align: center; border-radius: var(--border-radius-md); cursor: pointer; transition: border-color 0.2s;">
-                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--color-gray-400); margin-bottom: 10px;"></i>
-                    <p style="margin: 0; color: var(--color-gray-500);">Click to upload or drag and drop</p>
-                    <p style="margin: 0; font-size: 0.8rem; color: var(--color-gray-400);">.xlsx, .csv files only</p>
+            @if (!string.IsNullOrEmpty(Model.Message))
+            {
+                <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger")" style="padding: 10px; border-radius: 5px; margin-bottom: 15px; background-color: @(Model.IsSuccess ? "#dcfce7" : "#fee2e2"); color: @(Model.IsSuccess ? "#166534" : "#991b1b");">
+                    @Model.Message
                 </div>
-            </div>
-            <div class="flex-between">
-                <a href="#" style="font-size: 0.9rem; text-decoration: underline;">Download Template</a>
-                <button class="btn btn-primary">
-                    <i class="fas fa-upload"></i> Import
-                </button>
-            </div>
+            }
+
+            <p>Import multiple records at once using a standard Excel template.</p>
+            
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label">Import Type</label>
+                    <select class="form-control">
+                        <option>New Employees</option>
+                        <option>Update Salaries</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Upload File</label>
+                    <input type="file" asp-for="Upload" class="form-control" accept=".xlsx" style="padding: 10px; height: auto;" />
+                    <p style="margin-top: 5px; font-size: 0.8rem; color: var(--color-gray-400);">.xlsx files only</p>
+                </div>
+                <div class="flex-between">
+                    <a href="#" style="font-size: 0.9rem; text-decoration: underline;">Download Template</a>
+                    <button type="submit" asp-page-handler="Import" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Import
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
