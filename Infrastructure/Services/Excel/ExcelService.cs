@@ -55,9 +55,11 @@ public class ExcelService : IExcelService
                 Department = GetValue(worksheet, row, headerMap, "departamento", "department", "area"),
                 Salary = GetValue(worksheet, row, headerMap, "salario", "salary"),
                 Position = GetValue(worksheet, row, headerMap, "cargo", "position", "rol"),
-                HireDate = GetValue(worksheet, row, headerMap, "fechaingreso", "hiredate"),
-                EducationLevel = GetValue(worksheet, row, headerMap, "niveleducativo", "educationlevel", "education"),
-                ProfessionalProfile = GetValue(worksheet, row, headerMap, "perfilprofesional", "professionalprofile", "profile")
+                HireDate = GetValue(worksheet, row, headerMap, "fechaingreso", "hiredate", "fecha de ingreso"),
+                BirthDate = GetValue(worksheet, row, headerMap, "fechanacimiento", "birthdate", "fecha de nacimiento"),
+                Status = GetValue(worksheet, row, headerMap, "estado", "status"),
+                EducationLevel = GetValue(worksheet, row, headerMap, "niveleducativo", "educationlevel", "education", "nivel educativo"),
+                ProfessionalProfile = GetValue(worksheet, row, headerMap, "perfilprofesional", "professionalprofile", "profile", "perfil profesional")
             });
         }
 
@@ -74,12 +76,20 @@ public class ExcelService : IExcelService
             .ToDictionaryAsync(p => p.Document);
 
         var allDepartmentNames = importData.Select(d => d.Department).Where(d => !string.IsNullOrEmpty(d)).Distinct().ToList();
-        var existingDepartments = await _context.Departments
-            .Where(d => allDepartmentNames.Contains(d.Name))
-            .ToDictionaryAsync(d => d.Name);
+        
+        // Fetch departments and create a case-insensitive dictionary
+        var dbDepartments = await _context.Departments.ToListAsync();
+        var existingDepartments = new Dictionary<string, Department>(StringComparer.OrdinalIgnoreCase);
+        foreach (var dept in dbDepartments)
+        {
+            if (!existingDepartments.ContainsKey(dept.Name))
+            {
+                existingDepartments[dept.Name] = dept;
+            }
+        }
 
         // 4. Process Rows
-        var newDepartments = new Dictionary<string, Department>();
+        var newDepartments = new Dictionary<string, Department>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var row in importData)
         {
@@ -117,7 +127,7 @@ public class ExcelService : IExcelService
                     Email = row.Email,
                     Phone = row.Phone,
                     Address = row.Address,
-                    Status = "Active",
+                    Status = !string.IsNullOrEmpty(row.Status) ? row.Status : "Active",
                     HireDate = DateOnly.FromDateTime(DateTime.Now),
                     EducationRecords = new List<EmployeeEducation>()
                 };
@@ -130,6 +140,7 @@ public class ExcelService : IExcelService
                 // Update Existing
                 if (!string.IsNullOrEmpty(row.Email)) person.Email = row.Email;
                 if (!string.IsNullOrEmpty(row.Phone)) person.Phone = row.Phone;
+                if (!string.IsNullOrEmpty(row.Address)) person.Address = row.Address;
                 
                 if (person is Employee emp)
                 {
@@ -147,9 +158,13 @@ public class ExcelService : IExcelService
             // Update Employee fields
             if (decimal.TryParse(row.Salary, out var sal)) employee.Salary = sal;
             if (!string.IsNullOrEmpty(row.Position)) employee.Position = row.Position;
+            if (!string.IsNullOrEmpty(row.Status)) employee.Status = row.Status;
             
             if (DateTime.TryParse(row.HireDate, out var hd)) 
                 employee.HireDate = DateOnly.FromDateTime(hd);
+            
+            if (DateTime.TryParse(row.BirthDate, out var bd)) 
+                employee.BirthDate = DateOnly.FromDateTime(bd);
 
             if (department != null) employee.Department = department;
 
@@ -175,6 +190,12 @@ public class ExcelService : IExcelService
                         education.ProfessionalProfile = row.ProfessionalProfile;
                 }
             }
+            
+            // Also update the main ProfessionalProfile on Employee if present
+            if (!string.IsNullOrEmpty(row.ProfessionalProfile))
+            {
+                employee.ProfessionalProfile = row.ProfessionalProfile;
+            }
         }
 
         await _context.SaveChangesAsync();
@@ -193,6 +214,8 @@ public class ExcelService : IExcelService
         public string? Salary { get; set; }
         public string? Position { get; set; }
         public string? HireDate { get; set; }
+        public string? BirthDate { get; set; }
+        public string? Status { get; set; }
         public string? EducationLevel { get; set; }
         public string? ProfessionalProfile { get; set; }
     }
