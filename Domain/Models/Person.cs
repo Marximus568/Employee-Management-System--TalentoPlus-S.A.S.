@@ -13,7 +13,7 @@ public abstract class Person : BaseEntity
     public string LastName { get; set; }
 
     public DateOnly BirthDate { get; set; }
-    public string Address { get; set; }
+    public string Address { get; set; }  = string.Empty;  
     public string Phone { get; set; }
     public string Email { get; set; }
 

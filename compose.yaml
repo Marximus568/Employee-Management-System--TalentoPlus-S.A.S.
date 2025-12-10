@@ -1,19 +1,19 @@
 ﻿version: "3.9"
 
 services:
-  # ==========================================
-  # DATABASE (PostgreSQL)
-  # ==========================================
+  # DATABASE
   postgres:
     image: postgres:17
     restart: always
     container_name: firm-postgres
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${DB_PORT}:5432"  # maps container's 5432 to host 5433
     volumes:
       - dbdata:/var/lib/postgresql/data
     networks:
@@ -24,64 +24,51 @@ services:
       timeout: 5s
       retries: 5
 
-  # ==========================================
-  # API (Backend)
-  # ==========================================
+  # API
   api:
     build:
       context: .
       dockerfile: API/Dockerfile
     container_name: firm-api
+    env_file:
+      - .env
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      # Override DB_CONNECTION for Docker networking
       - DB_CONNECTION=Server=postgres;Port=5432;Database=${DB_NAME};User Id=${DB_USER};Password=${DB_PASS};
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - JWT_ISSUER=${JWT_ISSUER}
-      - JWT_AUDIENCE=${JWT_AUDIENCE}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - SMTP_FROM=${SMTP_FROM}
     depends_on:
       postgres:
         condition: service_healthy
     ports:
-      - "${API_PORT}:8080"
+      - "5000:8080"
     networks:
       - firm-network
 
-  # ==========================================
-  # FRONTEND (Web)
-  # ==========================================
+  # FRONTEND / ADMIN DASHBOARD
   frontend:
     build:
       context: .
       dockerfile: Front-end.Web/Dockerfile
     container_name: firm-frontend
+    env_file:
+      - .env
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      # DB connection for frontend (if needed)
       - DB_CONNECTION=Server=postgres;Port=5432;Database=${DB_NAME};User Id=${DB_USER};Password=${DB_PASS};
       - API_BASE_URL=http://api:8080
     depends_on:
       - api
     ports:
-      - "${FRONTEND_PORT}:8080"
+      - "5001:8080"
     networks:
       - firm-network
 
-      # ==========================================
   # TEST SERVICE
-  # ==========================================
   test-express:
     build:
       context: .
       dockerfile: Test_Express/Dockerfile
     container_name: firm-test
+    env_file:
+      - .env
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
       - DB_CONNECTION=Server=postgres;Port=5432;Database=${DB_NAME};User Id=${DB_USER};Password=${DB_PASS};
     depends_on:
       postgres:
@@ -92,7 +79,6 @@ services:
 
 volumes:
   dbdata:
-
 
 networks:
   firm-network:
